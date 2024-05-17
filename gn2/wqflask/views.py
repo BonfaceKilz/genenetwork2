@@ -255,14 +255,8 @@ def gsearchtable():
     return flask.jsonify(current_page)
 
 
-"""@app.route("/gnqna", methods=["POST", "GET"]) ;;feature currently disabled
-;;use ga.genenetwork.org
-@require_oauth2
-"""
-
-
 def gnqna():
-
+    """This is currently disabled for GN2 and CD.  Use qa.genenetwork.org"""
     if request.method == "POST":
         try:
             def __error__(resp):
