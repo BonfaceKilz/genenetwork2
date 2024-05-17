@@ -148,17 +148,25 @@ def no_access_page():
 
 @app.route("/")
 def index_page():
+    from gn2.wqflask.external_errors import ExternalRequestError
     anon_id = session_info()["anon_id"]
-
+    resp = ""
     def __render__(colls):
         return render_template("index_page.html", version=current_app.config.get("GN_VERSION"),
                                gn_server_url=GN_SERVER_URL,
                                anon_collections=(
                                    colls if user_logged_in() else []),
                                anon_id=anon_id)
+    try:
+        resp = no_token_get(
+            f"auth/user/collections/{anon_id}/list")
+    except ExternalRequestError as excpt:
+        time_str = datetime.datetime.utcnow().strftime('%l:%M%p UTC %b %d, %Y')
+        app.logger.error(f"{request.url} ({time_str}) \n"
+                         f"{excpt.error}")
+        return __render__([])
 
-    return no_token_get(
-        f"auth/user/collections/{anon_id}/list").either(
+    return resp.either(
             lambda err: __render__([]),
             __render__)
 
